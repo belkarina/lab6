@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace std
@@ -11,50 +9,65 @@ namespace std
 		static int Main(string[] args)
 		{
 			Shop ourshop = new Shop();
-			ourshop = Shop.input(ourshop);
+			ourshop = Shop.input();
 			ourshop.output(ourshop);
-			Console.WriteLine("Sum price = " + Shop.add(ourshop));
+			int sum = ourshop + ourshop;
+			Console.WriteLine("Sum price = " + sum);
 			Console.WriteLine();
-			Console.WriteLine("Program is over.");
-			Thread.Sleep(10000);
+			Console.ReadKey();
+			Console.Clear();
+			//Console.WriteLine("Price of 1st item = " + ourshop.returnPrice(0));
+			//Console.WriteLine("Price of 1st item = " + (ourshop++).returnPrice(0));
+			//Console.WriteLine("Price of 1st item = " + (ourshop).returnPrice(0));
+			//Console.WriteLine("Price of 1st item = " + (++ourshop).returnPrice(0));
+
+			int amount = 2;
+			Shop[] arrShop = new Shop[amount];
+
+			for (int i = 0; i < 2; i++)
+				arrShop[i] = new Shop(amount + i);
+
+			for (int i = 0; i < 2; i++)
+				arrShop[i].output(arrShop[i]);
+
+
+			//string value, value1;
+			//value1 = "";
+			//ourshop.func1(out value, ref value1);
+			Console.WriteLine("Program is over. Press any key to exit.");
+			Console.ReadKey();
 
 			return 0;
 		}
 
-// Create class
+// Create struct
 	class Item
 	{
-		private	string country;
+		private string country;
 		private string name;
 		private double price;
 
-			// Init
 			public Item()
-			{
+            {
 				country = "";
 				name = "";
 				price = 0;
-			}
-			// Correct(?) init
-			public Item(string newCountry, string newName, double newPrice)
+            }
+
+            // Correct(?) init
+            public Item(string newCountry, string newName, double newPrice)
 			{
 				country = newCountry;
 				name = newName;
 				price = newPrice;
 			}
 
-			public string getCountry()
-			{
-				return (country);
-			}
-			public string getName()
-			{
-				return (name);
-			}
-			public double getPrice()
-			{
-				return (price);
-			}
+			public string getCountry => country;
+
+			public string getName => name;
+			
+			public double getPrice => price;
+
 			public void setCountry(string newCountry)
 			{
 				country = newCountry;
@@ -78,13 +91,13 @@ namespace std
 				{
 					Console.WriteLine("Input country of " + (i + 1) + " product: ");
 					newCountry = Console.ReadLine();
-				} while (newCountry[0] == '\0' || newCountry[0] == ' ');
+				} while (String.IsNullOrEmpty(newCountry) || newCountry[0] == ' ');
 
 				do
 				{
 					Console.WriteLine("Input name of " + (i + 1) + " product: ");
 					newName = Console.ReadLine();
-				} while (newName[0] == '\0' || newName[0] == ' ');
+				} while (String.IsNullOrEmpty(newName) || newName[0] == ' ');
 
 
 				Console.WriteLine("Input price of " + (i + 1) + " product: ");
@@ -120,14 +133,14 @@ namespace std
 			public static void sale(Item item, int num)
 			{
 				for (int i = 0; i < num; i++)
-					item.setPrice(item.getPrice() * 0.5);
+					item.setPrice(item.getPrice * 0.5);
 			}
 
 			// Add markup
-			public void markup(Item item, int num)
+			public static void markup(Item item, int num)
 			{
 				for (int i = 0; i < num; i++)
-					item.setPrice(item.getPrice() * 2);
+					item.setPrice(item.getPrice * 2);
 			}
 	};
 
@@ -135,49 +148,75 @@ namespace std
 	{
 			private Item[] prod = new Item[MAX];
 			private int quantityProd;
+			private static string nameShop = "Welcome to our shop network!";
+
 			// Init
 			public Shop()
-			{
-				quantityProd = 0;
+            {
+				this.quantityProd = 0;
 			}
+
 
 			// Correct(?) init
 			public Shop(int newQuantityProd)
 			{
-				quantityProd = newQuantityProd;
+				this.quantityProd = newQuantityProd;
+				for (int i = 0; i < quantityProd; i++)
+					prod[i] = new Item();
 			}
 
-			public int getQuantityProd()
-			{
-				return (quantityProd);
-			}
+			public int getQuantityProd => quantityProd;
 
-			public static Shop input(Shop ourshop)
+			public static Shop input()
 			{
-				int quantityProd;
+				int quantityProd = 0;
 				Item[] prod = new Item[MAX];
-				do
+				//do
+				//{
+				//	Console.WriteLine("How many products do you have in your shop?");
+				//	do
+				//	{
+				//		while (!int.TryParse(Console.ReadLine(), out quantityProd))
+				//			Console.WriteLine("Error! Input a positive number!");
+				//	} while (quantityProd <= 0);
+				//} while (quantityProd > MAX);
+
+				try
 				{
 					Console.WriteLine("How many products do you have in your shop?");
-					do
+					//Console.Read(quantityProd);
+					quantityProd = int.Parse(Console.ReadLine());
+					if (quantityProd <= 0 || quantityProd > MAX)
 					{
-						while (!int.TryParse(Console.ReadLine(), out quantityProd))
-							Console.WriteLine("Error! Input a positive number!");
-					} while (quantityProd <= 0);
-				} while (quantityProd <= 0 || quantityProd > MAX);
-				ourshop.quantityProd = quantityProd;
+						throw new Exception();
+					}
+				}
+				catch (FormatException)
+				{
+					Console.WriteLine("Sorry, some problems with input. You was enter not number. Press any key to exit.");
+					Console.ReadKey();
+					System.Environment.Exit(1);
+					
+				}
+				catch (Exception)
+                {
+					Console.WriteLine("Sorry, some problems with input. You was enter negative/zero or too big number. Press any key to exit.");
+					Console.ReadKey();
+					System.Environment.Exit(1);
+				}
+
+				Shop ourshop = new Shop(quantityProd);
+				
 
 				for (int i = 0; i < quantityProd; i++)
 				{
-					ourshop.prod[i] = Item.input(i);
+					Item smth = Item.input(i);
+					ourshop.prod[i] = smth;
 					Console.WriteLine("If you want to have the same products - enter their quantity without the one just entered.");
 					Console.WriteLine("If you don't want to - enter anything and click enter.");
 					int num;
-					do
-					{
-						while (!int.TryParse(Console.ReadLine(), out num))
-							Console.WriteLine("Error! Input a positive number!");
-					} while (num <= 0);
+					if (!int.TryParse(Console.ReadLine(), out num))
+						num = 0;
 
 					if (num > 0 && num < (quantityProd - i))
 					{
@@ -193,27 +232,42 @@ namespace std
 
 			public void output(Shop ourshop)
 			{
+				Console.WriteLine(nameShop);
 				for (int i = 0; i < quantityProd; i++)
 				{
 					ourshop.prod[i].output(ourshop.prod[i], i);
 				}
 			}
 
-			public static int add(Shop ourshop)
+			public static int operator +(Shop ourshop, Shop shop)
 			{
-				return (Item.add(ourshop.prod[0], ourshop.prod[0]));
+				return (Item.add(ourshop.prod[0], shop.prod[0]));
+			}
+
+			public static Shop operator ++(Shop ourshop)
+			{
+                Shop shop = new Shop(ourshop.getQuantityProd);
+                ourshop.prod[0].setPrice(ourshop.prod[0].getPrice + 1);
+                shop = ourshop;
+                return shop;
+            }
+
+			public double returnPrice(int i)
+			{
+				return this.prod[i].getPrice;
 			}
 
 			public static int add(Item item, Item secondItem)
 			{
 				int sum;
-				sum = Convert.ToInt32(item.getPrice()) + Convert.ToInt32(secondItem.getPrice());
+				sum = Convert.ToInt32(item.getPrice) + Convert.ToInt32(secondItem.getPrice);
 				return sum;
 			}
 
-		~Shop()
-		{
-		}
-	}; 
+			public void func1(out string value, ref string value1)
+			{
+				value = "Hello World!";
+			}
+		}; 
     }
 }
